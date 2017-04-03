@@ -3,4 +3,4 @@ jdk:
   - oraclejdk8
 sudo: false
 script
-  - maven test -Parq-widlfly-managed
+  - mvn test -Parq-widlfly-managed
