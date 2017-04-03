@@ -8,13 +8,10 @@
     <packaging>war</packaging>
     <name>javaee1</name>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.fork>true</maven.compiler.fork>
-        <version.arquillian_core>1.1.5.Final</version.arquillian_core>    
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>               
         <version.arquillian>1.1.13.Final</version.arquillian>
         <version.wildfly>10.1.0.Final</version.wildfly>
+        <jbossHome>{project.basedir}/target/wildfly-{version.wildfly}</jbossHome>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -65,12 +62,106 @@
             </plugin>
         </plugins>
     </build>
+   
+    <profiles>
+        <profile>
+            <id>arq-wildfly-remote</id>           
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
+                    <version>8.2.1.Final</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>       
+        <profile>		
+            <id>arq-wildfly-managed</id>           
+            
+            <dependencies>			
+                <dependency>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-embedded</artifactId>
+                    <version>10.0.0.Alpha6</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.wildfly.arquillian</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <version>2.1.0.Alpha1</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            
+            <build>
+			
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                    </testResource>
+                </testResources>
+                
+                <plugins>
+                    
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${version.wildfly}</version>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>target</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.19.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <systemPropertyVariables>
+                                        <arquillian.launch>wildfly-managed</arquillian.launch>
+                                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>     
+                                        <jboss.home>${project.basedir}/target/wildfly-{version.wildfly}</jboss.home>
+                                        <module.path>${project.basedir}/target/wildfly-{version.wildfly}/modules</module.path>                                    
+                                    </systemPropertyVariables>
+                                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                                </configuration>                               
+                            </execution>
+                        </executions>
+                    </plugin>                         
+                    
+                </plugins>                
+            </build>
+            
+        </profile>       
+    </profiles>
     
     <dependencies>
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-container-test-api</artifactId>
-            <version>1.1.13.Final</version>
             <scope>test</scope>
             <type>jar</type>
         </dependency>
@@ -101,7 +192,6 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
-            <version>1.1.13.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -117,87 +207,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <profiles>
-        <profile>
-            <id>arquillian-wildfly-remote</id>           
-            <dependencies>
-                <dependency>
-                    <groupId>org.wildfly</groupId>
-                    <artifactId>wildfly-arquillian-container-remote</artifactId>
-                    <version>8.2.1.Final</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>       
-        <profile>
-            <id>arquillian-wildfly-managed</id>           
-            <dependencies>
-                <dependency>
-                    <groupId>org.wildfly</groupId>
-                    <artifactId>wildfly-embedded</artifactId>
-                    <version>10.0.0.Alpha6</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.wildfly.arquillian</groupId>
-                    <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>2.1.0.Alpha1</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <executions>
-                            <execution>
-                                <id>unpack</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.wildfly</groupId>
-                                            <artifactId>wildfly-dist</artifactId>
-                                            <version>${version.wildfly}</version>
-                                            <type>zip</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>target</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.19.1</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                                <configuration>
-                                    <systemPropertyVariables>
-                                        <arquillian.launch>wildfly-managed</arquillian.launch>
-                                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>     
-                                        <jboss.home>${project.basedir}/target/{version.wildfly}</jboss.home>
-                                        <module.path>${project.basedir}/target/{version.wildfly}/modules</module.path>                                    
-                                    </systemPropertyVariables>
-                                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                                </configuration>                               
-                            </execution>
-                        </executions>
-                    </plugin>                         
-                </plugins>                
-            </build>
-            
-        </profile>       
-    </profiles>
 </project>

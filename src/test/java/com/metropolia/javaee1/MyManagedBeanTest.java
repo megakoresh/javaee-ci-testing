@@ -5,7 +5,6 @@
  */
 package com.metropolia.javaee1;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import org.jboss.arquillian.container.test.api.Deployment;
