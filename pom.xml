@@ -42,7 +42,7 @@
         </repository>
     </repositories>
     
-        <dependencies>
+    <dependencies>
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-container-test-api</artifactId>
@@ -132,21 +132,14 @@
             </dependencies>
         </profile>       
         <profile>		
-            <id>arq-wildfly-managed</id>           
-            
-            <dependencies>			
-                <dependency>
-                    <groupId>org.wildfly</groupId>
-                    <artifactId>wildfly-embedded</artifactId>
-                    <version>10.0.0.Alpha6</version>
-                    <scope>test</scope>
-                </dependency>
+            <id>arq-wildfly-managed</id>                       
+            <dependencies>
                 <dependency>
                     <groupId>org.wildfly.arquillian</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
                     <version>2.1.0.Alpha1</version>
                     <scope>test</scope>
-                </dependency>
+                </dependency>                     
             </dependencies>
             
             <build>
@@ -198,7 +191,7 @@
                                 </goals>
                                 <configuration>
                                     <systemPropertyVariables>
-                                        <arquillian.launch>wildfly-managed</arquillian.launch>
+                                        <arquillian.launch>arq-wildfly-managed</arquillian.launch>
                                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>     
                                         <jboss.home>${project.basedir}/target/wildfly-{version.wildfly}</jboss.home>
                                         <module.path>${project.basedir}/target/wildfly-{version.wildfly}/modules</module.path>                                    
