@@ -11,7 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>               
         <version.arquillian>1.1.13.Final</version.arquillian>
         <version.wildfly>10.1.0.Final</version.wildfly>
-        <jbossHome>{project.basedir}/target/wildfly-{version.wildfly}</jbossHome>
+        <jboss.home>${project.basedir}/target/wildfly-${version.wildfly}</jboss.home>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -181,6 +181,16 @@
                     
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <jboss.home>${jboss.home}</jboss.home>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                    
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>2.19.1</version>
                         <executions>
@@ -193,8 +203,8 @@
                                     <systemPropertyVariables>
                                         <arquillian.launch>arq-wildfly-managed</arquillian.launch>
                                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>     
-                                        <jboss.home>${project.basedir}/target/wildfly-{version.wildfly}</jboss.home>
-                                        <module.path>${project.basedir}/target/wildfly-{version.wildfly}/modules</module.path>                                    
+                                        <jboss.home>${jboss.home}</jboss.home>
+                                        <module.path>${jboss.home}/modules</module.path>                                    
                                     </systemPropertyVariables>
                                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
                                 </configuration>                               
