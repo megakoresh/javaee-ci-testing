@@ -3,4 +3,4 @@ jdk:
   - oraclejdk8
 sudo: false
 script:
-  - mvn -Parq-widlfly-managed test
+  - mvn -Parq-wildfly-managed test
